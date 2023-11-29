@@ -1,2 +1,2 @@
-# PENUTS
-PENUTS Project
+# PEANUTS
+PEANUTS Project
