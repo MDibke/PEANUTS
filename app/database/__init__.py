@@ -6,13 +6,21 @@ Description:
 Version: 6.1.0
 """
 
-
 import aiosqlite
-
 
 class DatabaseManager:
     def __init__(self, *, connection: aiosqlite.Connection) -> None:
         self.connection = connection
+
+    async def initialize(self, sql_file: str) -> None:
+        """
+        Initialize the database using SQL statements from a file.
+
+        :param init_sql_file: The path to the SQL file for initialization.
+        """
+        with open(sql_file, 'r') as sql_file:
+            init_sql = sql_file.read()
+            await self.connection.executescript(init_sql)
 
     async def add_warn(
         self, user_id: int, server_id: int, moderator_id: int, reason: str

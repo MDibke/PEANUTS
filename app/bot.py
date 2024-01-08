@@ -12,8 +12,8 @@ import os
 import platform
 import random
 import sys
-
 import aiosqlite
+
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
@@ -27,7 +27,9 @@ else:
     with open(f"{os.path.realpath(os.path.dirname(__file__))}/config.json") as file:
         config = json.load(file)
 
-"""	
+load_dotenv()
+
+"""
 Setup bot intents (events restrictions)
 For more information about intents, please go to the following websites:
 https://discordpy.readthedocs.io/en/latest/intents.html
@@ -141,15 +143,13 @@ class DiscordBot(commands.Bot):
         self.config = config
         self.database = None
 
-    async def init_db(self) -> None:
-        async with aiosqlite.connect(
-            f"{os.path.realpath(os.path.dirname(__file__))}/database/database.db"
-        ) as db:
-            with open(
-                f"{os.path.realpath(os.path.dirname(__file__))}/database/schema.sql"
-            ) as file:
-                await db.executescript(file.read())
-            await db.commit()
+    async def hook_db(self) -> None:
+        db_path = os.getenv("DB_PATH")
+        init_db_file_path = os.getenv("DB_INIT_FILE_PATH")
+
+        connection = await aiosqlite.connect(db_path)
+        self.database = DatabaseManager(connection=connection)
+        await self.database.initialize(init_db_file_path)
 
     async def load_cogs(self) -> None:
         """
@@ -183,6 +183,9 @@ class DiscordBot(commands.Bot):
         await self.wait_until_ready()
 
     async def setup_hook(self) -> None:
+        self.logger.info(f"Setup hooks...")
+        await self.hook_db()
+
         """
         This will just be executed when the bot starts the first time.
         """
@@ -193,14 +196,8 @@ class DiscordBot(commands.Bot):
             f"Running on: {platform.system()} {platform.release()} ({os.name})"
         )
         self.logger.info("-------------------")
-        await self.init_db()
         await self.load_cogs()
         self.status_task.start()
-        self.database = DatabaseManager(
-            connection=await aiosqlite.connect(
-                f"{os.path.realpath(os.path.dirname(__file__))}/database/database.db"
-            )
-        )
 
     async def on_message(self, message: discord.Message) -> None:
         """
@@ -287,7 +284,6 @@ class DiscordBot(commands.Bot):
             raise error
 
 
-load_dotenv()
-
+token = os.getenv("TOKEN")
 bot = DiscordBot()
-bot.run(os.getenv("TOKEN"))
+bot.run(token)
