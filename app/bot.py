@@ -12,8 +12,8 @@ import os
 import platform
 import random
 import sys
-import aiosqlite
 
+import aiosqlite
 import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
@@ -205,7 +205,10 @@ class DiscordBot(commands.Bot):
 
         :param message: The message that was sent.
         """
-        print(message.content)
+        if 'quoi' in message.content.lower():
+            await message.channel.send("feur")
+            #todo: remove some point to the user
+
         if message.author == self.user or message.author.bot:
             return
         await self.process_commands(message)
