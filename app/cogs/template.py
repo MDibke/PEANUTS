@@ -5,7 +5,8 @@ Description:
 
 Version: 6.1.0
 """
-
+import discord
+from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
 
@@ -31,6 +32,14 @@ class Template(commands.Cog, name="template"):
 
         # Don't forget to remove "pass", I added this just because there's no content in the method.
         pass
+
+    @commands.hybrid_command(
+        name="fuckantoine",
+        description="The bot will fuck Antoine.",
+    )
+    @app_commands.describe(message="The message to fuck Antoine")
+    async def fuckantoine(self, context: Context, user: discord.User, *, message: str) -> None:
+        await context.send(f"{user.mention}{message}")
 
 
 # And then we finally add the cog to the bot so that it can load, unload, reload and use it's content.
