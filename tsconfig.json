@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "composite": true,
         "target": "es2021",
         "module": "es2022",
         "lib": ["es2021"],
@@ -15,5 +16,5 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "exclude": ["dist", "node_modules", "tests"]
+    "include": ["src"]
 }
