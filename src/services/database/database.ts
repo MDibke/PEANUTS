@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import sqlite, { open, ISqlite } from 'sqlite';
 import sqlite3 from 'sqlite3';
 
-export class Database {
+export class DatabaseService {
     private static DB_PATH = process.cwd() + '/database/database.db';
     private static INIT_FILE = process.cwd() + '/database/init.sql';
 
@@ -47,37 +47,10 @@ export class Database {
         else sql = fs.readFileSync(params['initFilePath'] || this.INIT_FILE, 'utf8');
 
         try {
-            await this.clear();
             await this.db.exec(sql);
         } catch (error) {
             throw new Error('Error initializing database:' + error.message);
         }
-    }
-
-
-    /**
-     * Clear the database by dropping all tables and recreating them.
-     */
-    public static async clear(): Promise<void> {
-        const tableNames = await this.getTableNames();
-        if (tableNames.length === 0) return;
-        const sql = tableNames.map(table => `DROP TABLE ${table};`).join('\n');
-
-        try {
-            await this.db.exec(sql);
-        } catch (error) {
-            throw new Error('Error clearing database:' + error.message);
-        }
-    }
-
-
-    /**
-     * Get all table names in the database.
-     * @returns All table names.
-     */
-    public static async getTableNames(): Promise<string[]> {
-        const result = await this.db.all("SELECT name FROM sqlite_master WHERE type='table'");
-        return result.map(row => row.name);
     }
 
 

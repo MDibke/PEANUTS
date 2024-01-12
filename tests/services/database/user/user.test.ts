@@ -1,8 +1,9 @@
-import { Database } from '../../../../src/services/database/database';
-import { Users } from '../../../../src/services/database/users';
+import { DatabaseService as Database } from '../../../../src/services/database/database';
+import { UserService as Users } from '../../../../src/services/database/user';
 import { TEST_DB_PATH } from '../database.test';
 
 export const DB_INIT = `
+    DROP TABLE IF EXISTS 'users';
     CREATE TABLE IF NOT EXISTS 'users' (
         'id' int(11) NOT NULL PRIMARY KEY,
         'level' int(11) NOT NULL,
@@ -12,8 +13,8 @@ export const DB_INIT = `
     INSERT INTO 'users' ('id', 'level', 'xp') VALUES (2, 1, 10);
 `;
 
-describe('Users Service function', () => {
-    beforeEach(async () => {
+describe('Users Service functions', () => {
+    beforeAll(async () => {
         await Database.open(TEST_DB_PATH);
     });
 
@@ -21,9 +22,7 @@ describe('Users Service function', () => {
         await Database.init({ query: DB_INIT });
     });
 
-    afterEach(async () => {
-        await Database.clear();
-    });
+    afterEach(async () => {});
 
     afterAll(async () => {
         await Database.close();
@@ -33,7 +32,7 @@ describe('Users Service function', () => {
 
     test('Get', async () => {
         const user = await Users.get(1);
-        
+
         expect(user).toEqual({ id: 1, level: 10, xp: 5000 });
     });
 

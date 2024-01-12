@@ -1,20 +1,15 @@
-import { Database } from '../../../src/services/database/database';
+import { DatabaseService as Database } from '../../../src/services/database/database';
 
 export const TEST_DB_PATH = process.cwd() + '/tests/database/database.test.db';
 
 export const DB_INIT = `
+    DROP TABLE IF EXISTS 'users';
     CREATE TABLE IF NOT EXISTS 'users' (
-        'id' int(11) NOT NULL,
-        'name' varchar(255) NOT NULL
+        'id' int(11) NOT NULL PRIMARY KEY,
+        'level' int(11) NOT NULL,
+        'xp' int(11) NOT NULL
     );
-
-    CREATE TABLE IF NOT EXISTS 'animals' (
-        'id' int(11) NOT NULL,
-        'name' varchar(255) NOT NULL,
-        'weight' int(11) NOT NULL
-    );
-
-    INSERT INTO 'users' ('id', 'name') VALUES (1, 'John Doe');
+    INSERT INTO 'users' ('id', 'level', 'xp') VALUES (1, 10, 5000);
 `;
 
 describe('Database function', () => {
@@ -35,23 +30,8 @@ describe('Database function', () => {
     /* -------------------------------------------------------------------------- */
 
     test('Init', async () => {
-        const user = await Database.get('SELECT name FROM users WHERE id = ?', 1);
+        const user = await Database.get('SELECT * FROM users WHERE id = ?', 1);
 
-        expect(user).toEqual({ name: 'John Doe' });
-    });
-
-    test('Get table names', async () => {
-        const tableNames = await Database.getTableNames();
-
-        expect(tableNames).toContain('users');
-        expect(tableNames).toContain('animals');
-    });
-
-    test('Clear', async () => {
-        await Database.clear();
-
-        const tableNames = await Database.getTableNames();
-
-        expect(tableNames).toHaveLength(0);
+        expect(user).toEqual({ id: 1, level: 10, xp: 5000 });
     });
 });

@@ -1,5 +1,4 @@
-import { User } from '../../models/user';
-import { Database } from './database';
+import { DatabaseService as Database } from './database';
 
 type UserDBModel = {
     id: number;
@@ -7,8 +6,7 @@ type UserDBModel = {
     xp: number;
 };
 
-export class Users {
-
+export class UserService {
     constructor() {}
 
     /**
@@ -17,18 +15,16 @@ export class Users {
      * @returns The user or undefined if not found.
      */
     public static async get(id: number): Promise<UserDBModel | undefined> {
-        return Database.get<User>('SELECT * FROM users WHERE id = ?', id);
+        return Database.get<UserDBModel>('SELECT * FROM users WHERE id = ?', id);
     }
-
 
     /**
      * Get all users from the database.
      * @returns All users.
      */
     public static async getAll(): Promise<UserDBModel[]> {
-        return Database.all<User>('SELECT * FROM users');
+        return Database.all<UserDBModel>('SELECT * FROM users');
     }
-
 
     /**
      * Add a user to the database.
@@ -37,12 +33,9 @@ export class Users {
      */
     public static async add(id: number, level: number, xp: number): Promise<boolean> {
         if (await this.get(id)) return false;
-        await Database.exec(
-            `INSERT INTO users (id, level, xp) VALUES (?, ?, ?)`, [ id, level, xp ]
-        );
+        await Database.exec(`INSERT INTO users (id, level, xp) VALUES (?, ?, ?)`, [id, level, xp]);
         return true;
     }
-
 
     /**
      * Delete a user from the database.
@@ -54,7 +47,6 @@ export class Users {
         return !!result.changes;
     }
 
-
     /**
      * Update a user's values in the database.
      * @param id The user id.
@@ -63,7 +55,11 @@ export class Users {
      * @returns True if the user was updated, false if the user was not found.
      */
     public static async update(id: number, level: number, xp: number): Promise<boolean> {
-        const result = await Database.exec('UPDATE users SET level = ?, xp = ? WHERE id = ?', [ level, xp, id ]);
+        const result = await Database.exec('UPDATE users SET level = ?, xp = ? WHERE id = ?', [
+            level,
+            xp,
+            id,
+        ]);
         return !!result.changes;
     }
 }
